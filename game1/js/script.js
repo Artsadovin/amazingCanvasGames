@@ -71,6 +71,9 @@ let CANDY = {
   sizeY: 75,
   candyMoving: false,
   direction: 0,
+  speedUp: 3,
+  speedDown: -3,
+  bottomMargin: 17,
   model: candy,
 }
 
@@ -130,7 +133,8 @@ function mouseMoveHandler(event){
 }
 
 function isUpCorrect(){
-  if(ALL_WORDS.wordsO[ALL_WORDS.wordNum] === ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum] && ALL_WORDS.wordNum < 6){
+  let wordWithoutSpace = ALL_WORDS.wordsCrack[ALL_WORDS.wordNum][ALL_WORDS.wordsCrack[ALL_WORDS.wordNum].indexOf('_')] = 'о';
+  if(wordWithoutSpace === ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum] && ALL_WORDS.wordNum < 6){
     res++;
   } else if(ALL_WORDS.wordNum >= 5){
     setTimeout(function (){GAME.isGame = false;}, 300);
@@ -191,13 +195,14 @@ function drawFrame(){
 function update(){
   if(CANDY.direction === 1){
     ALL_WORDS.wordsCrack[ALL_WORDS.wordNum] = ALL_WORDS.wordsA[ALL_WORDS.wordNum];
-    CANDY.y += 5;
-    ALL_WORDS.y += 5;
+    CANDY.y += CANDY.speedUp;
+    ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
   } else if(CANDY.direction === 2){
     ALL_WORDS.wordsCrack[ALL_WORDS.wordNum] = ALL_WORDS.wordsO[ALL_WORDS.wordNum];
-    CANDY.y -= 5;
-    ALL_WORDS.y -= 5;
+    CANDY.y += CANDY.speedDown;
+    ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
   }
+  isCandyAbort();
 }
 
 function isCandyAbort(){
@@ -216,11 +221,10 @@ function removeObject(){
 function play(){
   if(GAME.isGame){
     drawFrame();
-    if(CANDY.candyMoving){
+    if(CANDY.candyMoving) {
       update();
     }
-    isCandyAbort();
-    window.requestAnimationFrame(play);
+    requestAnimationFrame(play);
   } else{
     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
     loseScreen();
