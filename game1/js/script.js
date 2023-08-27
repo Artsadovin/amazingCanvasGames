@@ -13,34 +13,7 @@ fontTovari.load().then(function(font) {
   document.fonts.add(font);
 });
 
-let background = new Image();
-background.src = 'img/bg.jpg';
-background.onload = function() {
-  canvasContext.drawImage(background, 0, 0, canvasWidth, canvasHeight);
-}
 
-let backgroundWithOutInstruction = new Image();
-backgroundWithOutInstruction.src = 'img/bgWithOutInstruction.png';
-backgroundWithOutInstruction.onload = function() {
-}
-
-let candy = new Image();
-candy.src = 'img/sweet.png';
-candy.onload = function () {
-  canvasContext.drawImage(candy, CANDY.x, CANDY.y, CANDY.size, CANDY.size);
-}
-
-let arrowUp = new Image();
-arrowUp.src = 'img/up.png';
-arrowUp.onload = function () {
-  canvasContext.drawImage(arrowUp, ARROW_UP.x, ARROW_UP.y, ARROW_UP.sizeX, ARROW_UP.sizeY);
-}
-
-let arrowDown = new Image();
-arrowDown.src = 'img/down.png';
-arrowDown.onload = function () {
-  canvasContext.drawImage(arrowDown, ARROW_DOWN.x, ARROW_DOWN.y, ARROW_DOWN.sizeX, ARROW_DOWN.sizeY);
-}
 
 let ALL_WORDS = {
   wordsCrack:  ['р_збирать', 'р_звес', 'р_зыгрышный', 'р_здать', 'р_зберём', 'р_зведка'],
@@ -66,7 +39,7 @@ let CANDY = {
   direction: 0,
   speed: 3,
   bottomMargin: 17,
-  model: candy,
+  model: undefined,
 }
 
 let ARROW_UP = {
@@ -74,7 +47,7 @@ let ARROW_UP = {
   y: 430,
   sizeX: 70,
   sizeY: 90,
-  model: arrowUp,
+  model: undefined,
 }
 
 let ARROW_DOWN = {
@@ -82,7 +55,7 @@ let ARROW_DOWN = {
   y: 432,
   sizeX: 70,
   sizeY: 90,
-  model: arrowDown,
+  model: undefined,
 }
 
 let BACKGROUND = {
@@ -90,11 +63,44 @@ let BACKGROUND = {
   y: 0,
   sizeX: canvasWidth,
   sizeY: canvasHeight,
-  model: background,
+  model: undefined,
 }
 
 let GAME = {
   isGame: true,
+}
+
+let background = new Image();
+background.src = 'img/bg.jpg';
+BACKGROUND.model = background;
+background.onload = function() {
+  canvasContext.drawImage(background, 0, 0, canvasWidth, canvasHeight);
+}
+
+let backgroundWithOutInstruction = new Image();
+backgroundWithOutInstruction.src = 'img/bgWithOutInstruction.png';
+backgroundWithOutInstruction.onload = function() {
+}
+
+let candy = new Image();
+candy.src = 'img/sweet.png';
+CANDY.model = candy;
+candy.onload = function () {
+  canvasContext.drawImage(candy, CANDY.x, CANDY.y, CANDY.size, CANDY.size);
+}
+
+let arrowUp = new Image();
+arrowUp.src = 'img/up.png';
+ARROW_UP.model = arrowUp;
+arrowUp.onload = function () {
+  canvasContext.drawImage(arrowUp, ARROW_UP.x, ARROW_UP.y, ARROW_UP.sizeX, ARROW_UP.sizeY);
+}
+
+let arrowDown = new Image();
+arrowDown.src = 'img/down.png';
+ARROW_DOWN.model = arrowDown;
+arrowDown.onload = function () {
+  canvasContext.drawImage(arrowDown, ARROW_DOWN.x, ARROW_DOWN.y, ARROW_DOWN.sizeX, ARROW_DOWN.sizeY);
 }
 
 function mouseDownHandler(event){
@@ -109,22 +115,6 @@ function mouseDownHandler(event){
     CANDY.candyMoving = true;
     countIfWordCorrect(ALL_WORDS.wordsCrack[ALL_WORDS.wordNum], ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum], "а");
     CANDY.speed = 3;
-  }
-}
-
-function isUpCorrect(){
-  if(ALL_WORDS.wordsO[ALL_WORDS.wordNum] === ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum] && ALL_WORDS.wordNum < 6){
-    res++;
-  } else if(ALL_WORDS.wordNum >= 5){
-    setTimeout(function (){GAME.isGame = false;}, 300);
-  }
-}
-
-function isDownCorrect(){
-  if(ALL_WORDS.wordsA[ALL_WORDS.wordNum] === ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum] && ALL_WORDS.wordNum < 6){
-    res++;
-  } else if(ALL_WORDS.wordNum >= 5){
-    setTimeout(function (){GAME.isGame = false;}, 300);
   }
 }
 
