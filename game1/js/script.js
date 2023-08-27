@@ -54,14 +54,6 @@ let ALL_WORDS = {
   startY: 520,
 }
 
-
-
-const mouse = {
-  x: 0,
-  y: 0,
-  over: false,
-};
-
 let CANDY = {
   x: 400,
   y: 427,
@@ -71,8 +63,7 @@ let CANDY = {
   sizeY: 75,
   candyMoving: false,
   direction: 0,
-  speedUp: 3,
-  speedDown: -3,
+  speed: 3,
   bottomMargin: 17,
   model: candy,
 }
@@ -105,31 +96,19 @@ let GAME = {
   isGame: true,
 }
 
-function mouseEnterHandler(event){
-  mouse.over = true;
-}
-
-function mouseLeaveHandler(event){
-  mouse.over = false;
-}
-
 function mouseDownHandler(event){
-  if(mouse.x >= 550 && mouse.x <= 620 && mouse.y >= 430 && mouse.y <= 520 && !CANDY.candyMoving){
-    isUpCorrect();
+  let mouseX = event.clientX;
+  let mouseY = event.clientY;
+  if(!CANDY.candyMoving) {
     CANDY.candyMoving = true;
-    CANDY.direction = 2;
-  } else if(mouse.x >= 630 && mouse.x <= 700 && mouse.y >= 432 && mouse.y <= 522 && !CANDY.candyMoving){
-    isDownCorrect();
-    CANDY.candyMoving = true;
-    CANDY.direction = 1;
+    if (mouseX >= ARROW_UP.x && mouseX <= (ARROW_UP.x + ARROW_UP.sizeX) && mouseY >= ARROW_UP.y && mouseY <= (ARROW_UP.y + ARROW_UP.sizeY)) {
+      isUpCorrect();
+      CANDY.speed = -3;
+    } else if (mouseX >= ARROW_DOWN.x && mouseX <= (ARROW_DOWN.x + ARROW_DOWN.sizeX) && mouseY >= ARROW_DOWN.y && mouseY <= (ARROW_DOWN.y + ARROW_DOWN.sizeY)) {
+      isDownCorrect();
+      CANDY.speed = 3;
+    }
   }
-}
-
-function mouseMoveHandler(event){
-  const rect = canvas.getBoundingClientRect();
-  mouse.x = event.clientX - rect.left;
-  mouse.y = event.clientY - rect.top;
-
 }
 
 function isUpCorrect(){
@@ -162,9 +141,6 @@ function loseScreen(){
 
 function initEventListeners(){
   canvas.addEventListener('mousedown', mouseDownHandler);
-  canvas.addEventListener('mouseenter', mouseEnterHandler);
-  canvas.addEventListener('mouseleave', mouseLeaveHandler);
-  canvas.addEventListener('mousemove', mouseMoveHandler);
 }
 
 function draw(obj){
@@ -193,15 +169,13 @@ function drawFrame(){
 }
 
 function update(){
-  if(CANDY.direction === 1){
+  if(CANDY.speed > 0){
     ALL_WORDS.wordsCrack[ALL_WORDS.wordNum] = ALL_WORDS.wordsA[ALL_WORDS.wordNum];
-    CANDY.y += CANDY.speedUp;
-    ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
-  } else if(CANDY.direction === 2){
+  } else{
     ALL_WORDS.wordsCrack[ALL_WORDS.wordNum] = ALL_WORDS.wordsO[ALL_WORDS.wordNum];
-    CANDY.y += CANDY.speedDown;
-    ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
   }
+  CANDY.y += CANDY.speed;
+  ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
   isCandyAbort();
 }
 
