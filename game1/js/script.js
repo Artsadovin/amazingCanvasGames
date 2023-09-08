@@ -28,6 +28,13 @@ let ALL_WORDS = {
 
 ALL_WORDS.userWord = ALL_WORDS.wordsCrack[0];
 
+let AM_NYAM = {
+  x: 400,
+  y: 0,
+  state: 0,
+  model: undefined,
+}
+
 let CANDY = {
   x: 400,
   y: 427,
@@ -81,6 +88,9 @@ let backgroundWithOutInstruction = new Image();
 backgroundWithOutInstruction.src = 'img/bgWithOutInstruction.png';
 backgroundWithOutInstruction.onload = function() {
 }
+
+let amnyam = new Image();
+amnyam.src = 'img/amnyamSprites.png'
 
 let candy = new Image();
 candy.src = 'img/sweet.png';
@@ -167,10 +177,15 @@ function drawFrame(){
   drawContent();
 }
 
+function drawSprite(obj){
+
+}
+
 function update(){
   CANDY.y += CANDY.speed;
   ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
   isCandyAbort();
+  drawSprite(AM_NYAM);
 }
 
 function isCandyAbort(){
