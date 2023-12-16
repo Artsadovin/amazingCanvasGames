@@ -35,6 +35,23 @@ let AM_NYAM = {
   model: undefined,
 }
 
+let AM_NYAM_FRAMES = {
+  isSpriteOnGoing: false,
+  model: undefined,
+  start: false,
+  frameSizeX: 170,
+  frameSizeY: 170,
+  selectedSprite: 0,
+  count: 3,
+  x: 400,
+  y: 0,
+  width: 170,
+  height: 170,
+  spriteDuration: 1000,
+  spritesInterval: undefined,
+  canDraw: false,
+}
+
 let CANDY = {
   x: 400,
   y: 427,
@@ -89,8 +106,12 @@ backgroundWithOutInstruction.src = 'img/bgWithOutInstruction.png';
 backgroundWithOutInstruction.onload = function() {
 }
 
-let amnyam = new Image();
-amnyam.src = 'img/amnyamSprites.png'
+let amnyamSprites = new Image();
+amnyamSprites.src = 'img/amnyamSprites.png'
+AM_NYAM_FRAMES.model = amnyamSprites;
+amnyamSprites.onload = function () {
+  canvasContext.drawImage(amnyamSprites, 0, 0);//canvasContext.drawImage(amnyamSprites, 0, 0, AM_NYAM_FRAMES.frameSizeX, AM_NYAM_FRAMES.frameSizeY, AM_NYAM_FRAMES.x, AM_NYAM_FRAMES.y, AM_NYAM_FRAMES.width, AM_NYAM_FRAMES.height);
+}
 
 let candy = new Image();
 candy.src = 'img/sweet.png';
@@ -116,18 +137,43 @@ arrowDown.onload = function () {
 function mouseDownHandler(event){
   let mouseX = event.clientX;
   let mouseY = event.clientY
-
-  if (mouseX >= ARROW_UP.x && mouseX <= (ARROW_UP.x + ARROW_UP.sizeX) && mouseY >= ARROW_UP.y && mouseY <= (ARROW_UP.y + ARROW_UP.sizeY) && !CANDY.candyMoving) {
-    CANDY.candyMoving = true;
-    countIfWordCorrect(ALL_WORDS.wordsCrack[ALL_WORDS.wordNum], ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum], "о");
-    CANDY.speed = -3;
-  } else if (mouseX >= ARROW_DOWN.x && mouseX <= (ARROW_DOWN.x + ARROW_DOWN.sizeX) && mouseY >= ARROW_DOWN.y && mouseY <= (ARROW_DOWN.y + ARROW_DOWN.sizeY) && !CANDY.candyMoving){
-    CANDY.candyMoving = true;
-    countIfWordCorrect(ALL_WORDS.wordsCrack[ALL_WORDS.wordNum], ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum], "а");
-    CANDY.speed = 3;
+  let oldRes = res;
+  if(CANDY.candyMoving === false) {
+    if (mouseX >= ARROW_UP.x && mouseX <= (ARROW_UP.x + ARROW_UP.sizeX) && mouseY >= ARROW_UP.y && mouseY <= (ARROW_UP.y + ARROW_UP.sizeY) && !CANDY.candyMoving) {
+      CANDY.candyMoving = true;
+      countIfWordCorrect(ALL_WORDS.wordsCrack[ALL_WORDS.wordNum], ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum], "о");
+      CANDY.speed = -3;
+    } else if (mouseX >= ARROW_DOWN.x && mouseX <= (ARROW_DOWN.x + ARROW_DOWN.sizeX) && mouseY >= ARROW_DOWN.y && mouseY <= (ARROW_DOWN.y + ARROW_DOWN.sizeY) && !CANDY.candyMoving) {
+      CANDY.candyMoving = true;
+      countIfWordCorrect(ALL_WORDS.wordsCrack[ALL_WORDS.wordNum], ALL_WORDS.wordsCorrect[ALL_WORDS.wordNum], "а");
+      CANDY.speed = 3;
+    }
+    if (res > oldRes)
+      setAmnyamDrawable();
+    setResetTimeOut(3500);
   }
 }
 
+function setAmnyamDrawable(){
+  AM_NYAM_FRAMES.start = true;
+  AM_NYAM_FRAMES.y = canvasHeight / 2;
+  AM_NYAM_FRAMES.x = canvasWidth / 2;
+  AM_NYAM_FRAMES.canDraw = true;
+  AM_NYAM_FRAMES.isSpriteOnGoing = true;
+}
+
+function setResetTimeOut(duration)
+{
+  setTimeout(() => {
+    CANDY.candyMoving = false;
+    ALL_WORDS.wordNum++;
+    ALL_WORDS.userWord = ALL_WORDS.wordsCrack[ALL_WORDS.wordNum];
+    if(ALL_WORDS.wordNum === 6){
+      GAME.isGame = false;
+    }
+    removeObject();
+  }, duration);
+}
 function countIfWordCorrect(wordCrack, correctWord, userLetter){
   let finalWord = wordCrack;
   finalWord = finalWord.replace("_", userLetter);
@@ -152,8 +198,30 @@ function initEventListeners(){
   canvas.addEventListener('mousedown', mouseDownHandler);
 }
 
+function drawSprites(obj) {
+  if (obj.canDraw) {
+    drawImageSpite(obj);
+    if (obj.start) {
+      obj.spritesInterval = setInterval(() => {
+        obj.selectedSprite += 1;
+        if (obj.selectedSprite > obj.count - 1){
+          clearInterval(obj.spritesInterval)
+          obj.canDraw = false;
+          AM_NYAM_FRAMES.isSpriteOnGoing = false;
+          obj.selectedSprite = 0
+        }
+      }, obj.spriteDuration);
+      obj.start = false;
+    }
+  }
+}
+
 function draw(obj){
-  canvasContext.drawImage(obj.model, obj.x, obj.y, obj.sizeX, obj.sizeY)
+  canvasContext.drawImage(obj.model, obj.x, obj.y, obj.sizeX, obj.sizeY);
+}
+
+function drawImageSpite(obj) {
+  canvasContext.drawImage(obj.model, obj.frameSizeX * obj.selectedSprite, 0, obj.frameSizeX, obj.frameSizeY, obj.x, obj.y, obj.width, obj.height);
 }
 
 function drawContent(){
@@ -171,21 +239,18 @@ function drawContent(){
 function drawFrame(){
   canvasContext.clearRect(0, 0, canvas.width, canvas.height);
   draw(BACKGROUND);
+  drawSprites(AM_NYAM_FRAMES);
   draw(CANDY);
   draw(ARROW_UP);
   draw(ARROW_DOWN);
   drawContent();
 }
 
-function drawSprite(obj){
-
-}
 
 function update(){
   CANDY.y += CANDY.speed;
   ALL_WORDS.y = CANDY.y + CANDY.sizeY + CANDY.bottomMargin;
-  isCandyAbort();
-  drawSprite(AM_NYAM);
+  //isCandyAbort();
 }
 
 function isCandyAbort(){
